@@ -17,7 +17,7 @@ NODE* newRegNode(char name[]) {
     strcpy(reg_node->name, name);
     reg_node->type = REG;
     reg_node->childPtr = reg_node->siblingPtr = reg_node->parentPtr = NULL;
-    
+
     return reg_node;
 }
 
@@ -27,6 +27,6 @@ NODE* newDirNode(char name[]) {
     strcpy(dir_node->name, name);
     dir_node->type = DIR;
     dir_node->childPtr = dir_node->siblingPtr = dir_node->parentPtr = NULL;
-    
+
     return dir_node;
 }

@@ -37,20 +37,25 @@ class FileSystem {
         }
     }
 
+    /**
+     * Create Dir
+     * @param string $pathName
+     * @return bool
+     */   
     public function mkdir(string $pathName): bool {
         if (empty($pathName)) {
             $this->logError("Invalid pathname!");
             return false;
         }
         list($dirname, $basename) = $this->dbname($pathName);
-        $parentDir = $this->searchDir($dirname);
+        $parentDir = $this->pathTraverse($dirname);
         if (!$parentDir || $parentDir->type !== NodeType::DIR) {
             $this->logError("Not a directory!");
             return false;
         }
 
         // Check if directory or file already exists
-        if ($this->searchDir($pathName) !== null) {
+        if ($this->pathTraverse($pathName) !== null) {
             $this->logError("Directory already exists!");
             return false;
         }
@@ -71,7 +76,7 @@ class FileSystem {
     }
 
     public function rmdir(string $path): bool {
-        $dir = $this->searchDir($path);
+        $dir = $this->pathTraverse($path);
         if ($dir === null || $dir->type !== NodeType::DIR) {
             $this->logError("Directory does not exist!");
             return false;
@@ -97,7 +102,7 @@ class FileSystem {
     }
 
     public function ls(string $path = ''): bool {
-        $dir = empty($path) ? $this->cwd : $this->searchDir($path);
+        $dir = empty($path) ? $this->cwd : $this->pathTraverse($path);
         if ($dir === null || $dir->type !== NodeType::DIR) {
             $this->logError("Not a directory!");
             return false;
@@ -113,7 +118,7 @@ class FileSystem {
     }
 
     public function cd(string $path): bool {
-        $dir = $this->searchDir($path);
+        $dir = $this->pathTraverse($path);
         if ($dir === null || $dir->type !== NodeType::DIR) {
             $this->logError("Directory does not exist!");
             return false;
@@ -137,14 +142,14 @@ class FileSystem {
 
     public function creat(string $path): bool {
         list($dirname, $basename) = $this->dbname($path);
-        $parentDir = $this->searchDir($dirname);
+        $parentDir = $this->pathTraverse($dirname);
         if ($parentDir === null || $parentDir->type !== NodeType::DIR) {
             $this->logError("Not a directory!");
             return false;
         }
 
         // Check if file already exists
-        if ($this->searchDir($path) !== null) {
+        if ($this->pathTraverse($path) !== null) {
             $this->logError("File already exists!");
             return false;
         }
@@ -165,7 +170,7 @@ class FileSystem {
     }
 
     public function rm(string $path): bool {
-        $file = $this->searchDir($path);
+        $file = $this->pathTraverse($path);
         if ($file === null || $file->type !== NodeType::REG) {
             $this->logError("File does not exist!");
             return false;
@@ -238,10 +243,15 @@ class FileSystem {
         return [$dirname, $basename];
     }
 
-    private function searchDir(string $dirname): ?FileSystemNode {
+    /**
+     * Traverse a given directory path:
+     *  `./path/to/a/file.f` -> returns the `a` node;
+     *  `/path/to/a/dir/` -> returns the `dir` node;
+     */
+    private function pathTraverse(string $dirname): ?FileSystemNode {
         // Traverse the file system to find the directory or file by path
         $current = $this->cwd;
-        $parts = explode('/', trim($dirname, '/'));
+        $parts = explode('/', trim($dirname, '/')); // array of nodes
 
         foreach ($parts as $part) {
             if (empty($part)) {

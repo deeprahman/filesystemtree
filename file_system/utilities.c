@@ -16,20 +16,20 @@
 
 /// Print file system tree
 void printFileSystemHelper(NODE *node, char prefix[]) {
-    
+
     if(node == NULL) return;
-    
+
     char temp[128] = "";
-    
+
     strcpy(temp, prefix);
     strcat(temp, "/");
     strcat(temp, node->name);
-    
+
     printf("%s\t\t%s\n", node->type==DIR? "DIR":"REG", temp);
-    
+
     printFileSystemHelper(node->childPtr, temp);
     printFileSystemHelper(node->siblingPtr, prefix);
-    
+
 }
 
 /// Print entire file system tree
@@ -37,7 +37,7 @@ void printEntireFileSystem(NODE *root) {
     if(!root) printf("Uninitialized Filesystem!\n");
     printf("type\tpathname\n");
     printf("----\t--------\n");
-    
+
     printf("%s\t\t%s\n", root->type==DIR? "DIR":"REG", "/");
     printFileSystemHelper(root->childPtr, root->name);
 }
@@ -79,35 +79,35 @@ void dbname(char *pathname, char *dname, char *bname) {
 
 /// Search for a node
 NODE* searchDir(fileSystem *fs, char *dirPath) {
-    
+
     if(!dirPath || strcmp(dirPath, ".")==0) return fs->cwd;
     if(strcmp(dirPath, "/")==0) return fs->root;
-    
+
     char *s;
     char temp[64];
     strcpy(temp, dirPath);
-    
+
     s = strtok(temp, "/");
-    
+
     NODE *curr = fs->cwd;
     if(dirPath[0]=='/') curr = fs->root;
 
     while(s && curr) {
-        
+
         if(curr->childPtr) curr = curr->childPtr;
         while(curr && strcmp(curr->name, s)!=0) curr=curr->siblingPtr;
-        
+
         s = strtok(0, "/");
     }
-    
+
     return curr;
 }
 
 /// Search for a file in a directory
 NODE* searchInDir(NODE *dirNode, char fileName[]) {
     if(!dirNode) return NULL;
-strcmp(curr->name, s)!=0strcmp(curr->name, s)!=0    
-    NODE *t = dirNode->childPtr;
+    strcmp(curr->name, s)!=0strcmp(curr->name, s)!=0    
+        NODE *t = dirNode->childPtr;
     while(t && strcmp(t->name, fileName)!=0) t = t->siblingPtr;
     return t;
 }
