@@ -1,0 +1,6 @@
+DIR	/
+DIR	//dl1
+DIR	//dl1/dl2
+DIR	//d2l1
+REG	//fl1.f
+REG	//f2l1.f
